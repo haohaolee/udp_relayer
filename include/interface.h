@@ -1,0 +1,32 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// http://github.com/haohaolee/udp_relayer
+//
+// Copyright (C) 2014 haohaolee <hayatelee[at]gmail.com>
+//
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+//
+///////////////////////////////////////////////////////////////////////////////
+#ifndef CONFIG_H_INC_
+#define CONFIG_H_INC_
+
+#pragma once
+
+#include <vector>
+namespace hhl {
+
+std::vector<unsigned short> get_ports_from_config();
+
+int start_udp_relayer();
+
+int stop_udp_relayer();
+
+void add_target(DWORD);
+
+void remove_target(DWORD);
+
+}
+
+#endif

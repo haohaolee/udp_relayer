@@ -1,0 +1,10 @@
+EXPORTS
+    MprAdminAcceptNewConnection = MprAdminAcceptNewConnection@8
+    MprAdminAcceptNewLink = MprAdminAcceptNewLink@8
+    MprAdminConnectionHangupNotification = MprAdminConnectionHangupNotification@8
+    MprAdminGetIpAddressForUser = MprAdminGetIpAddressForUser@16
+    MprAdminInitializeDll = MprAdminInitializeDll@0
+    MprAdminLinkHangupNotification = MprAdminLinkHangupNotification@8
+    MprAdminReleaseIpAddress = MprAdminReleaseIpAddress@12
+    MprAdminTerminateDll = MprAdminTerminateDll@0
+

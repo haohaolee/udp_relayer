@@ -1,0 +1,11 @@
+LIBRARY udp_relayer.dll
+EXPORTS
+    MprAdminAcceptNewConnection
+    MprAdminAcceptNewLink
+    MprAdminConnectionHangupNotification
+    MprAdminGetIpAddressForUser
+    MprAdminInitializeDll
+    MprAdminLinkHangupNotification
+    MprAdminReleaseIpAddress
+    MprAdminTerminateDll
+
