@@ -16,13 +16,13 @@
 DWORD __stdcall MprAdminInitializeDll()
 {
     TRACE(_T("Initializing Mpr Admin dll\n"));
-    return hhl::start_udp_relayer();
+    return hhl::start_server();
 }
 
 DWORD __stdcall MprAdminTerminateDll()
 {
     TRACE(_T("Terminating Mpr Admin dll\n"));
-    return hhl::stop_udp_relayer();
+    return hhl::stop_server();
 }
 
 BOOL __stdcall MprAdminAcceptNewLink(RAS_PORT_0 *pRasPort0,

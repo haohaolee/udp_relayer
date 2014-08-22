@@ -19,9 +19,9 @@ namespace hhl {
 
 std::vector<unsigned short> get_ports_from_config();
 
-int start_udp_relayer();
+int start_server();
 
-int stop_udp_relayer();
+int stop_server();
 
 void add_target(DWORD);
 

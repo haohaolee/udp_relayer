@@ -17,6 +17,7 @@
 #ifdef _DEBUG
 #include <windows.h>
 #include <tchar.h>
+#include <stdio.h>
 #include <assert.h>
 #endif
 
@@ -32,8 +33,10 @@
 
 #ifdef _DEBUG
 // disable 4996 in MSVC for unsafe _snprintf
-#pragma warning(push)
-#pragma warning(disable: 4996)
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable: 4996)
+#endif
 
 #ifndef _countof
 #define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
@@ -110,7 +113,10 @@ struct Tracer
 
 }
 
-#pragma warning(pop)
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
+
 #endif
 
 #ifdef _DEBUG

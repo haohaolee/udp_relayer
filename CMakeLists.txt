@@ -23,7 +23,7 @@ project(udp_relayer)
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "-Wall")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
   include(CheckCXXCompilerFlag)
   CHECK_CXX_COMPILER_FLAG(-std=c++11 HAVE_STD11)
   CHECK_CXX_COMPILER_FLAG(-Wno-unused-local-typedefs HAVE_NOUNUSED_LOCAL_TYPEDEF)
@@ -54,7 +54,7 @@ add_definitions("/D_WIN32_WINNT=0x0502") # at least for server 2003
 # Boost package
 ###############################################################################
 
-SET(Boost_USE_STATIC_LIBS    ON)
+set(Boost_USE_STATIC_LIBS    ON)
 find_package(Boost 1.49.0 COMPONENTS thread system date_time chrono regex REQUIRED)
 if (NOT ${Boost_FOUND})
   message(FATAL_ERROR "Boost not found (or too old)")
@@ -63,6 +63,9 @@ include_directories(BEFORE ${Boost_INCLUDE_DIR})
 
 ###############################################################################
 # udp_relayer package
+if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+    add_definitions(-D_DEBUG)
+endif(${CMAKE_BUILD_TYPE} STREQUAL Debug)
 
 include_directories(BEFORE include)
 
@@ -70,6 +73,7 @@ add_library(udp_relayer SHARED
     src/udp_relayer.cc
     src/ras_dll.cc
     src/config.cc
+    src/server.cc
     ${DEF}
 )
 
