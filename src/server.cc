@@ -11,12 +11,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "common.h"
+#include <Shlwapi.h>
+#include <boost/range.hpp>
 #include "interface.h"
+#include "config.h"
 #include "server.h"
 
 
 namespace hhl {
-
 
 server::server(port_vector ports,
                bool ios_per_thread)
@@ -140,15 +142,32 @@ void server::remove_target(address_v4 const& addr)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 
 
-std::unique_ptr<server> g_server_ptr;
+extern "C" IMAGE_DOS_HEADER __ImageBase;
+static std::string get_config_path()
+{
+    static char dll_path[MAX_PATH];
+    std::size_t size = ::GetModuleFileNameA(
+                        (HINSTANCE(&__ImageBase)), dll_path, boost::size(dll_path)
+                        );
+    if (size > 0 && size < boost::size(dll_path))
+	{
+        std::string config_path = std::string(dll_path)+".json";
+        if (PathFileExistsA(config_path.c_str()))
+            return std::move(config_path);
+	}
 
+    using namespace boost::system;
+	throw system_error(
+            errc::no_such_file_or_directory, generic_category(), "no config file");
+
+}
 
 template<typename Handler>
-int catch_exception(Handler&& h)
+static int catch_exception(Handler&& h)
 {
     try {
         (h)();
@@ -170,18 +189,22 @@ int catch_exception(Handler&& h)
     return -1;
 }
 
+// global server instance
+std::unique_ptr<server> g_server_ptr;
+
 int start_server()
 {
     return catch_exception([]()
     {
-        using namespace boost::system;
-        auto ports = get_ports_from_config();
-        if (ports.empty())
-            throw system_error(::GetLastError(), system_category());
+        server_config config;
+        config.parse(get_config_path());
 
         g_server_ptr =
             std::unique_ptr<server>(
-                    new server(ports)
+                    new server(
+                        config.get_ports_config(),
+                        config.get_ios_per_thread_config()
+                        )
                     );
 
         g_server_ptr->start();

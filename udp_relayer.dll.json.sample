@@ -1,5 +1,6 @@
 
 {
+    "ios_per_thread" : false,
     "ports" : [320, 430, 530]
 }
 

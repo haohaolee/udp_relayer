@@ -23,7 +23,7 @@ project(udp_relayer)
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
   include(CheckCXXCompilerFlag)
   CHECK_CXX_COMPILER_FLAG(-std=c++11 HAVE_STD11)
   CHECK_CXX_COMPILER_FLAG(-Wno-unused-local-typedefs HAVE_NOUNUSED_LOCAL_TYPEDEF)
@@ -63,9 +63,7 @@ include_directories(BEFORE ${Boost_INCLUDE_DIR})
 
 ###############################################################################
 # udp_relayer package
-if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
-    add_definitions(-D_DEBUG)
-endif(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+set (CMAKE_CXX_FLAGS_DEBUG  "-D_DEBUG")
 
 include_directories(BEFORE include)
 

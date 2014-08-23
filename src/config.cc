@@ -12,43 +12,24 @@
 #include "common.h"
 #include <fstream>
 #include <sstream>
-#include <Shlwapi.h>
 #include <boost/system/system_error.hpp>
-#include <boost/range.hpp>
 #include "rapidjson/document.h"
-#include "interface.h"
+#include "config.h"
 
-extern "C" IMAGE_DOS_HEADER __ImageBase;
 
 namespace hhl {
+namespace {
 
-static std::string get_config_path()
+using namespace rapidjson;
+
+void parse_ports_config(
+    Document& d,
+    char const* key,
+    boost::optional<std::vector<unsigned short> >& config
+)
 {
-    static char dll_path[MAX_PATH];
-    std::size_t size = ::GetModuleFileNameA(
-                        (HINSTANCE(&__ImageBase)), dll_path, boost::size(dll_path)
-                        );
-    if (size > 0 && size < boost::size(dll_path))
-	{
-        std::string config_path = std::string(dll_path)+".json";
-        if (PathFileExistsA(config_path.c_str()))
-            return std::move(config_path);
-	}
-
-    using namespace boost::system;
-	throw system_error(
-            errc::no_such_file_or_directory, generic_category(), "no config file");
-
-}
-
-static std::vector<unsigned short>
-get_ports_from_json(std::string const& json)
-{
-    using namespace rapidjson;
     std::vector<unsigned short> ports;
-    Document d;
-    d.Parse(json.c_str());
-    auto const& value = d["ports"];
+    auto const& value = d[key];
     if (value.IsArray())
     {
         for(auto it = value.Begin(); it != value.End(); ++it)
@@ -58,21 +39,34 @@ get_ports_from_json(std::string const& json)
         }
     }
 
-    return std::move(ports);
+    if (!ports.empty())
+        config = boost::make_optional(std::move(ports));
+    
 }
 
-std::vector<unsigned short>
-get_ports_from_config()
+void parse_ios_per_thread_config(
+        Document& d,
+        char const* key,
+        boost::optional<bool>& config
+       )
+{
+    auto& b = d[key];
+    if (b.IsBool())
+        config = boost::make_optional(b.GetBool());
+}
+
+std::string
+get_json_string(std::string const& file_path)
 {
     std::ifstream in(
-            get_config_path(), std::ios::in | std::ios::binary
+            file_path, std::ios::in | std::ios::binary
             );
     if (in)
     {
         std::ostringstream contents;
         contents << in.rdbuf();
         in.close();
-        return get_ports_from_json(contents.str());
+        return contents.str();
     }
 
     using namespace boost::system;
@@ -82,7 +76,60 @@ get_ports_from_config()
                 error, system_category());
 
     throw std::runtime_error("unknown error in get_ports_from_config");
+
 }
+
+}
+
+///////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+//
+
+server_config::server_config()
+: ports_config_{"ports", {}}
+, ios_per_thread_config_{"io_service_per_thread", {}}
+{
+}
+
+
+void server_config::parse(std::string const& path)
+{
+    std::string json = get_json_string(path);
+
+    using namespace rapidjson;
+    Document d;
+    d.Parse(json.c_str());
+
+    parse_ports_config(d,
+            ports_config_.key.c_str(),
+            ports_config_.value
+    );
+
+    parse_ios_per_thread_config(d,
+            ios_per_thread_config_.key.c_str(),
+            ios_per_thread_config_.value
+    );
+
+}
+
+
+bool server_config::get_ios_per_thread_config()
+{
+    if (ios_per_thread_config_.value)
+        return *(ios_per_thread_config_.value);
+
+    throw std::runtime_error("config ios_per_thread is invalid");
+}
+
+std::vector<unsigned short> const&
+server_config::get_ports_config()
+{
+    if (ports_config_.value)
+        return *(ports_config_.value);
+
+    throw std::runtime_error("config ports is invalid");
+}
+
 
 }
 

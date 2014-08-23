@@ -9,15 +9,12 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef CONFIG_H_INC_
-#define CONFIG_H_INC_
+#ifndef INTERFACE_H_INC_
+#define INTERFACE_H_INC_
 
 #pragma once
 
-#include <vector>
 namespace hhl {
-
-std::vector<unsigned short> get_ports_from_config();
 
 int start_server();
 
