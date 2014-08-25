@@ -21,6 +21,13 @@ cmake_minimum_required(VERSION 3.0)
 
 project(udp_relayer)
 
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    MESSAGE(STATUS "Setting cmake build type to 'Debug' as none was specified.")
+    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
@@ -30,21 +37,26 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STRE
 
   if (HAVE_NOUNUSED_LOCAL_TYPEDEF)
         ADD_DEFINITIONS("-Wno-unused-local-typedefs")
-  endif()
+  endif ()
 
   if (NOT HAVE_STD11)
       MESSAGE(FATAL_ERROR "No advanced standard C++ support (-std=c++11 not defined).")
-  endif()
+  endif ()
 
   add_definitions("-std=c++11 -Wextra -Wall")
+
+  if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+      add_definitions("-ggdb -g3")
+      add_definitions("-D_DEBUG")
+  endif ()
 
   set(DEF "src/ras_dll.mingw.def")
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    set(CMAKE_CXX_FLAGS "/W4 /EHsc")
-    add_definitions("/D_UNICODE /DUNICODE")
-    set(DEF "src/ras_dll.msvc.def")
-endif()
+  set(CMAKE_CXX_FLAGS "/W4 /EHsc")
+  add_definitions("/D_UNICODE /DUNICODE")
+  set(DEF "src/ras_dll.msvc.def")
+endif ()
 
 ##############################################################################
 # Set WINVER Definition
@@ -63,7 +75,6 @@ include_directories(BEFORE ${Boost_INCLUDE_DIR})
 
 ###############################################################################
 # udp_relayer package
-set (CMAKE_CXX_FLAGS_DEBUG  "-D_DEBUG")
 
 include_directories(BEFORE include)
 

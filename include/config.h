@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 
@@ -37,6 +38,8 @@ private:
     {
         std::string         key;
         boost::optional<T>  value;
+		item(std::string const& k)
+		:key(k) {}
     };
 
     item<ports_type>        ports_config_;

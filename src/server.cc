@@ -12,7 +12,6 @@
 
 #include "common.h"
 #include <Shlwapi.h>
-#include <boost/range.hpp>
 #include "interface.h"
 #include "config.h"
 #include "server.h"
@@ -151,9 +150,9 @@ static std::string get_config_path()
 {
     static char dll_path[MAX_PATH];
     std::size_t size = ::GetModuleFileNameA(
-                        (HINSTANCE(&__ImageBase)), dll_path, boost::size(dll_path)
+                        (HINSTANCE(&__ImageBase)), dll_path, _countof(dll_path)
                         );
-    if (size > 0 && size < boost::size(dll_path))
+    if (size > 0 && size < _countof(dll_path))
 	{
         std::string config_path = std::string(dll_path)+".json";
         if (PathFileExistsA(config_path.c_str()))
@@ -180,6 +179,7 @@ static int catch_exception(Handler&& h)
     }
     catch (std::exception const& e)
     {
+		(void)e;
         TRACEA("std::exception: %s", e.what()); 
     }
     catch (...)

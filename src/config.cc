@@ -86,8 +86,8 @@ get_json_string(std::string const& file_path)
 //
 
 server_config::server_config()
-: ports_config_{"ports", {}}
-, ios_per_thread_config_{"io_service_per_thread", {}}
+: ports_config_("ports")
+, ios_per_thread_config_("io_service_per_thread")
 {
 }
 
